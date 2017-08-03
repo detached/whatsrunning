@@ -23,7 +23,7 @@ body {
 
 .project {
     float: left;
-    width: 6em;
+    width: 9em;
     height: auto;
     margin: 4px;
     /*background-color: #6e8898;*/
@@ -54,4 +54,9 @@ body {
 .content {
     padding: 4px;
     margin: 4px;
+    text-align: center;
+}
+
+.notification {
+
 }

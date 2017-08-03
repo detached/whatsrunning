@@ -10,7 +10,7 @@ import (
 
 var (
 	// Time allowed to write the file to the client.
-    writeWait = 10 * time.Second
+	writeWait = 10 * time.Second
 
 	// Time allowed to read the next pong message from the client.
 	pongWait = 60 * time.Second
@@ -27,7 +27,7 @@ var (
 )
 
 type message struct {
-	Action string `json:"action"`
+	Action  string `json:"action"`
 	Project Project `json:"project"`
 }
 
@@ -38,14 +38,14 @@ func RegisterWebsocket(r *mux.Router) {
 
 func wsHandler(writer http.ResponseWriter, request *http.Request) {
 
-	log.Println("Handle ws request")
+	log.Println("Start handling ws request for ", request.RemoteAddr)
 
 	ws, err := upgrader.Upgrade(writer, request, nil)
 	if err != nil {
 		if _, ok := err.(websocket.HandshakeError); !ok {
 			log.Println(err)
 		} else {
-			log.Println("Error service ws: ", err)
+			log.Println("Error serve ws: ", err)
 		}
 
 		return
@@ -66,15 +66,16 @@ func listenForChangedProjects(conn *websocket.Conn, projectUpdate <-chan Project
 
 	for {
 		select {
-		case p := <- projectUpdate:
-			log.Println("Send project update to ws")
+		case p := <-projectUpdate:
 
-			conn.WriteJSON(message{Action:"update", Project:p})
-			break
-		case <-pingTicker.C:
 			conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := conn.WriteJSON(message{Action: "update", Project: p}); err != nil {
+				log.Println("Error sending project update: ", err)
+				return
+			}
 
-			if err := conn.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
+		case <-pingTicker.C:
+			if err := conn.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(writeWait)); err != nil {
 				log.Println("Error ping ws: ", err)
 				return
 			}
@@ -83,21 +84,21 @@ func listenForChangedProjects(conn *websocket.Conn, projectUpdate <-chan Project
 }
 
 func answerPong(conn *websocket.Conn) {
-	defer func() {
-		conn.Close()
-	}()
+
+	defer conn.Close()
 
 	conn.SetReadDeadline(time.Now().Add(pongWait))
-	conn.SetPongHandler(func(string) error { conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+
+	conn.SetPongHandler(func(string) error {
+		conn.SetReadDeadline(time.Now().Add(pongWait));
+		return nil
+	})
 
 	for {
-		_, message, err := conn.ReadMessage()
+		_, _, err := conn.ReadMessage()
 		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
-				log.Printf("error: %v", err)
-			}
+			log.Printf("error: %v", err)
 			break
 		}
-		log.Println(message)
 	}
 }

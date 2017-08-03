@@ -1,3 +1,11 @@
+function createStageNode(project, deployment) {
+    var stageElement = document.createElement('div');
+    stageElement.id = createId(project, deployment.stage);
+    stageElement.appendChild(createHeader(deployment.stage, 'stage-header'));
+    stageElement.appendChild(createContent(createId(stageElement.id, "version"), deployment.version));
+    return stageElement;
+}
+
 function createProjectNode(project) {
     var projectElement = document.createElement('div');
     projectElement.id = project.name;
@@ -5,13 +13,7 @@ function createProjectNode(project) {
     projectElement.appendChild(createHeader(project.name, 'project-header'));
 
     project.deployments.forEach(function (deployment) {
-
-        var stageElement = document.createElement('div');
-        stageElement.id = deployment.stage;
-        stageElement.appendChild(createHeader(deployment.stage, 'stage-header'));
-        stageElement.appendChild(createContent("version", deployment.version));
-
-        projectElement.appendChild(stageElement);
+        projectElement.appendChild(createStageNode(project.name, deployment));
     });
 
     return projectElement;
@@ -22,33 +24,52 @@ function renderProjects() {
     var rootElement = document.getElementById('root');
     var projects = JSON.parse(projectsScriptTag.innerHTML);
 
-    projects.forEach(function (project) {
-        rootElement.appendChild(createProjectNode(project));
-    })
+    if (projects) {
+        projects.forEach(function (project) {
+            rootElement.appendChild(createProjectNode(project));
+        })
+    }
+}
+
+function createNotification(text) {
+    var notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.appendChild(document.createTextNode(text));
+    return notification;
 }
 
 function listenForChanges() {
 
-    var connection = new WebSocket("ws://" + document.location.host + "/ws");
+    var connection = new WebSocket('ws://' + document.location.host + '/ws');
     connection.onmessage = function(e) {
-        var message = e.data;
+        var message = JSON.parse(e.data);
 
+        console.log(message);
         if (message.action === 'update') {
             addOrUpdate(message.project);
         }
     };
+
     connection.onclose = function (e) {
-        console.log("Connection closed:", JSON.stringify(e))
+        var body = document.createElement('body');
+        body.appendChild(createNotification('Connection to server lost'));
+        console.log('Connection closed:', JSON.stringify(e))
     };
 }
 
 function updateProjectNode(projectNode, project) {
     project.deployments.forEach(function (deployment) {
 
-        var stageNode = projectNode.getElementById(deployment.stage);
+        var stageId = createId(project.name, deployment.stage);
+        var stageNode = document.getElementById(stageId);
 
         if (stageNode) {
-            stageNode.set
+
+            var versionId = createId(stageId, 'version');
+            stageNode.replaceChild(createContent(versionId, deployment.version), document.getElementById(versionId));
+        } else {
+
+            projectNode.appendChild(createStageNode(project.name, deployment));
         }
     });
 }
@@ -79,4 +100,8 @@ function createContent(id, text) {
     content.className = 'content';
     content.appendChild(document.createTextNode(text));
     return content;
+}
+
+function createId(project, stage) {
+    return project + "-" + stage ;
 }
