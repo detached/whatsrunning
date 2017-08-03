@@ -31,16 +31,10 @@ function renderProjects() {
     }
 }
 
-function createNotification(text) {
-    var notification = document.createElement('div');
-    notification.className = 'notification';
-    notification.appendChild(document.createTextNode(text));
-    return notification;
-}
-
 function listenForChanges() {
 
     var connection = new WebSocket('ws://' + document.location.host + '/ws');
+
     connection.onmessage = function(e) {
         var message = JSON.parse(e.data);
 
@@ -51,9 +45,9 @@ function listenForChanges() {
     };
 
     connection.onclose = function (e) {
-        var body = document.createElement('body');
-        body.appendChild(createNotification('Connection to server lost'));
-        console.log('Connection closed:', JSON.stringify(e))
+        var root = document.createElement('root');
+        alert('Connection to server lost');
+        console.log('Connection closed.')
     };
 }
 
