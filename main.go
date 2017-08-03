@@ -5,13 +5,25 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/detached/whatsrunning/config"
 	"github.com/detached/whatsrunning/project"
 	"github.com/detached/whatsrunning/dashboard"
+	"os"
 )
 
 func main() {
 
+	var confFile string
+
+	if len(os.Args) < 2 {
+		confFile = "config.json"
+	} else {
+		confFile = os.Args[1]
+	}
+
 	log.Println("== WhatsRunning? ==")
+
+	config.LoadConfig(confFile)
 
 	router := mux.NewRouter()
 
@@ -19,9 +31,7 @@ func main() {
 	project.RegisterHandler(router)
 	project.RegisterWebsocket(router)
 
-	var server = ":8080"
+	log.Println("Starting on", config.D.Server)
 
-	log.Printf("Starting on %s\n", server)
-
-	log.Fatal(http.ListenAndServe(server, router))
+	log.Fatal(http.ListenAndServe(config.D.Server, router))
 }

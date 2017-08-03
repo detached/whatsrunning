@@ -1,0 +1,6 @@
+{
+  "server" : ":8080",
+  "dashboard_template" : "./templates/dashboard.html",
+  "content_dir": "./dist/",
+  "storage_path": "./data"
+}

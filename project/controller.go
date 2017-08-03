@@ -35,9 +35,7 @@ func putDeploymentInfoHandler(w http.ResponseWriter, r *http.Request) {
 	var project, stage = parsePath(r)
 	var deployment Deployment
 
-	err := json.NewDecoder(r.Body).Decode(&deployment)
-
-	if err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&deployment); err != nil {
 		log.Printf("Error while reading body: %s \n", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -47,9 +45,7 @@ func putDeploymentInfoHandler(w http.ResponseWriter, r *http.Request) {
 
 	deployment.Stage = stage
 
-	err = store(project, stage, deployment)
-
-	if err != nil {
+	if err := store(project, stage, deployment); err != nil {
 		log.Printf("Error while storing stageInfo for %s on %s: %s \n", project, stage, err)
 		w.WriteHeader(http.StatusBadRequest)
 		return

@@ -9,26 +9,23 @@ import (
 	"github.com/detached/whatsrunning/config"
 )
 
-var (
-	dashboardTemplate = template.Must(template.ParseFiles(config.DashboardTemplate))
-)
+var dTemplate *template.Template
 
 func RegisterHandler(r *mux.Router) {
 	log.Println("GET on /")
 	r.HandleFunc("/", requestHandler).Methods("GET")
-	r.PathPrefix("/dist").Handler(http.StripPrefix("/dist", http.FileServer(http.Dir(config.ContentDir))))
+	r.PathPrefix("/dist").Handler(http.StripPrefix("/dist", http.FileServer(http.Dir(config.D.ContentDir))))
 }
 
 func requestHandler(w http.ResponseWriter, r *http.Request) {
 
-	var v view
-	v.Projects = project.GetAll()
-	v.WebsocketUrl = config.WebsocketUrl
+	if dTemplate == nil {
+		dTemplate = template.Must(template.ParseFiles(config.D.DashboardTemplate))
+	}
 
-	err := dashboardTemplate.Execute(w, v)
+	if err := dTemplate.Execute(w, view{Projects: project.GetAll()}); err != nil {
 
-	if err != nil {
-		log.Printf("Error while execute template %s: %s\n", config.DashboardTemplate, err)
+		log.Printf("Error while execute template %s: %s\n", config.D.DashboardTemplate, err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -36,5 +33,4 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 
 type view struct {
 	Projects        []project.Project
-	WebsocketUrl    string
 }

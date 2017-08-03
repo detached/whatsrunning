@@ -21,9 +21,8 @@ func get(project string, stage string) (*Deployment, error) {
 	}
 
 	var deployment Deployment
-	err = json.NewDecoder(f).Decode(&deployment)
 
-	if err != nil {
+	if err = json.NewDecoder(f).Decode(&deployment); err != nil {
 		log.Printf("Error while reading file %s: %s", filePath, err)
 		return nil, err
 	}
@@ -33,7 +32,7 @@ func get(project string, stage string) (*Deployment, error) {
 
 func GetAll() ([]Project) {
 
-	entries, err := ioutil.ReadDir(config.StoragePath)
+	entries, err := ioutil.ReadDir(config.D.StoragePath)
 
 	if err != nil {
 		log.Fatal("Can't read storage dir: ", err)
@@ -54,9 +53,8 @@ func GetAll() ([]Project) {
 func store(project string, stage string, deployment Deployment) error {
 
 	var deploymentFile = getDeploymentFile(project, stage)
-	err := os.MkdirAll(filepath.Dir(deploymentFile), 0760)
 
-	if err != nil {
+	if err := os.MkdirAll(filepath.Dir(deploymentFile), 0760); err != nil {
 		log.Printf("Error while creating dir: %s\n", err)
 		return err
 	}
@@ -70,9 +68,7 @@ func store(project string, stage string, deployment Deployment) error {
 
 	defer f.Close()
 
-	err = json.NewEncoder(f).Encode(deployment)
-
-	if err != nil {
+	if 	err = json.NewEncoder(f).Encode(deployment); err != nil {
 		log.Printf("Cant write file:%s\n", err)
 		return err
 	}
@@ -96,7 +92,7 @@ func createProject(fi os.FileInfo) Project {
 
 	p.Name = fi.Name()
 
-	projectDir := filepath.Join(config.StoragePath, fi.Name())
+	projectDir := filepath.Join(config.D.StoragePath, fi.Name())
 	entries, _ := ioutil.ReadDir(projectDir)
 
 	for i := 0; i < len(entries); i++ {
@@ -131,5 +127,5 @@ func createDeployment(filePath string) (*Deployment, error) {
 }
 
 func getDeploymentFile(project string, stage string) string {
-	return filepath.Join(config.StoragePath, project, stage+".json")
+	return filepath.Join(config.D.StoragePath, project, stage + ".json")
 }
