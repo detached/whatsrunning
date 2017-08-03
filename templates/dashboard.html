@@ -1,0 +1,24 @@
+<html>
+<head>
+    <title>Whats Running?</title>
+    <script language="JavaScript" type="application/javascript" src="/dist/dashboard.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/dist/dashboard.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+
+<script id="projects" type="application/json">{{.Projects}}</script>
+
+<div id="root">
+
+</div>
+
+<script language="JavaScript" type="application/javascript">
+    renderProjects();
+    listenForChanges();
+</script>
+
+</body>
+</html>

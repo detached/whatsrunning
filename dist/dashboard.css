@@ -1,0 +1,57 @@
+
+@media (max-width: 49em) {
+    html {
+        font-size: large;
+    }
+}
+
+@media (min-width: 50em) {
+    html {
+        font-size: xx-large;
+    }
+}
+
+body {
+    background-color: #404242;
+    color: #404242;
+    font-family: 'Roboto', sans-serif;
+}
+
+#root {
+
+}
+
+.project {
+    float: left;
+    width: 6em;
+    height: auto;
+    margin: 4px;
+    /*background-color: #6e8898;*/
+    background-color: #eff1f3;
+}
+
+.project-header {
+    /*background-color: #9fb1bc;*/
+    background-color: #8d99ae;
+    font-weight:bold;
+    text-align: center;
+    width: 100%;
+    display: block;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.stage-header {
+    /*background-color: #9fb1bc; */
+    background-color: #dbd3d8;
+    text-align: center;
+    width: 100%;
+    display: block;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.content {
+    padding: 4px;
+    margin: 4px;
+}
