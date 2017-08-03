@@ -20,7 +20,7 @@ func getDeploymentInfoHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Get info for %s on stage %s \n", project, stage)
 
-	var deployment, err = get(project, stage)
+	var deployment, err = GetStorage().Get(project, stage)
 
 	if err != nil {
 		log.Printf("Error while getting info for %s on %s: %s \n", project, stage, err)
@@ -45,7 +45,7 @@ func putDeploymentInfoHandler(w http.ResponseWriter, r *http.Request) {
 
 	deployment.Stage = stage
 
-	if err := store(project, stage, deployment); err != nil {
+	if err := GetStorage().Store(project, stage, deployment); err != nil {
 		log.Printf("Error while storing stageInfo for %s on %s: %s \n", project, stage, err)
 		w.WriteHeader(http.StatusBadRequest)
 		return

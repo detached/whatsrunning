@@ -23,7 +23,7 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 		dTemplate = template.Must(template.ParseFiles(config.D.DashboardTemplate))
 	}
 
-	if err := dTemplate.Execute(w, view{Projects: project.GetAll()}); err != nil {
+	if err := dTemplate.Execute(w, view{Projects: project.GetStorage().GetAll()}); err != nil {
 
 		log.Printf("Error while execute template %s: %s\n", config.D.DashboardTemplate, err)
 		w.WriteHeader(http.StatusBadRequest)

@@ -12,6 +12,7 @@ type Data struct {
 	Server	 			string	`json:"server"`
 	DashboardTemplate 	string	`json:"dashboard_template"`
 	ContentDir 			string	`json:"content_dir"`
+	StorageBackend      string  `json:"storage_backend"`
 	StoragePath 		string	`json:"storage_path"`
 }
 
