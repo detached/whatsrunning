@@ -18,12 +18,12 @@ func RegisterHandler(r *mux.Router) {
 func getDeploymentInfoHandler(w http.ResponseWriter, r *http.Request) {
 	var project, stage = parsePath(r)
 
-	log.Printf("Get info for %s on stage %s \n", project, stage)
+	log.Printf("Get %s on stage %s \n", project, stage)
 
 	var deployment, err = GetStorage().Get(project, stage)
 
 	if err != nil {
-		log.Printf("Error while getting info for %s on %s: %s \n", project, stage, err)
+		log.Printf("Error while getting %s on %s: %s \n", project, stage, err)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -41,12 +41,12 @@ func putDeploymentInfoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("Save stageInfo for project %s on stage %s \n", project, stage)
+	log.Printf("Save project %s on stage %s: %s\n", project, stage, deployment)
 
 	deployment.Stage = stage
 
 	if err := GetStorage().Store(project, stage, deployment); err != nil {
-		log.Printf("Error while storing stageInfo for %s on %s: %s \n", project, stage, err)
+		log.Printf("Error while storing %s on %s: %s \n", project, stage, err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
